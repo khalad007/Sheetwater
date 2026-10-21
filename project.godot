@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 Sfx="*uid://d8rhaw7wpdke"
+GameState="*uid://dkl4b0sx2nbya"
+Fade="*uid://cc1jc776arfjo"
 
 [display]
 

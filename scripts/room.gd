@@ -104,6 +104,8 @@ func show_caption(text: String) -> void:
 
 
 func _on_hotspot_activated(spot_data: Dictionary) -> void:
+	if spot_data.has("sets"):
+		GameState.set_flag(spot_data["sets"])
 	if spot_data.has("exit"):
 		exit_requested.emit(spot_data["exit"])
 	elif spot_data.has("text"):

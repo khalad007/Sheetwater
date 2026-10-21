@@ -8,6 +8,7 @@ extends RefCounted
 ##               id, label, rect [x, y, width, height] in 640x360 space
 ##               and EITHER "text" (shows a caption) OR "exit" (room id to go to)
 ## These three rooms are test placeholders. Real rooms replace them later.
+##               optional "sets": a flag name set to true on click
 
 const ROOMS: Dictionary = {
 	"bus_stop": {
@@ -16,7 +17,7 @@ const ROOMS: Dictionary = {
 		"bg": "res://art/bg_bus_stop.png",
 		"hotspots": [
 			{"id": "sign", "label": "Sign", "rect": [40, 110, 60, 130],
-				"text": "The sign has no name on it."},
+				 "text": "The sign has no name on it.", "sets": "read_sign"},
 			{"id": "bench", "label": "Bench", "rect": [200, 220, 170, 60],
 				"text": "An empty bench. The wood is still warm."},
 			{"id": "road", "label": "Road to the inn", "rect": [540, 100, 90, 200],
