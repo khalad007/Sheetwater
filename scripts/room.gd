@@ -9,6 +9,8 @@ var room_id: String = ""
 
 var _data: Dictionary = {}
 var _hotspots: Array[Hotspot] = []
+var _hovered_spot: Hotspot
+var _hover_label: Label
 var _caption_bg: ColorRect
 var _caption_label: Label
 var _caption_timer: Timer
@@ -24,7 +26,11 @@ func _ready() -> void:
 	_data = RoomData.ROOMS[room_id]
 	_build_background()
 	_build_hotspots()
+	_build_hover_label()
 	_build_caption()
+	GameState.flag_changed.connect(_refresh_hotspots.unbind(2))
+	GameState.item_added.connect(_refresh_hotspots.unbind(1))
+	_refresh_hotspots()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -69,8 +75,22 @@ func _build_hotspots() -> void:
 		spot.position = Vector2(r[0], r[1])
 		spot.size = Vector2(r[2], r[3])
 		spot.activated.connect(_on_hotspot_activated)
+		spot.hover_changed.connect(_on_hover_changed)
 		add_child(spot)
 		_hotspots.append(spot)
+
+
+func _build_hover_label() -> void:
+	_hover_label = Label.new()
+	_hover_label.position = Vector2(0, 6)
+	_hover_label.size = Vector2(640, 20)
+	_hover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hover_label.add_theme_font_size_override("font_size", 12)
+	_hover_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+	_hover_label.add_theme_constant_override("shadow_offset_x", 1)
+	_hover_label.add_theme_constant_override("shadow_offset_y", 1)
+	_hover_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_hover_label)
 
 
 func _build_caption() -> void:
@@ -103,9 +123,43 @@ func show_caption(text: String) -> void:
 	_caption_timer.start(maxf(2.5, text.length() * 0.05))
 
 
+func _refresh_hotspots() -> void:
+	for spot in _hotspots:
+		spot.refresh()
+	# A hotspot may have appeared/disappeared under a stationary mouse.
+	_hovered_spot = null
+	var mouse: Vector2 = get_local_mouse_position()
+	for spot in _hotspots:
+		if spot.visible and Rect2(spot.position, spot.size).has_point(mouse):
+			_hovered_spot = spot
+	for spot in _hotspots:
+		spot.set_hovered(spot == _hovered_spot)
+	_update_hover_label()
+
+
+func _on_hover_changed(spot: Hotspot, is_hovered: bool) -> void:
+	if is_hovered:
+		_hovered_spot = spot
+	elif _hovered_spot == spot:
+		_hovered_spot = null
+	_update_hover_label()
+
+
+func _update_hover_label() -> void:
+	if _hovered_spot:
+		_hover_label.text = str(_hovered_spot.data.get("label", ""))
+	else:
+		_hover_label.text = ""
+
+
 func _on_hotspot_activated(spot_data: Dictionary) -> void:
+	if not GameState.check_all(spot_data.get("needs", [])):
+		show_caption(str(spot_data.get("locked_text", "Not yet.")))
+		return
 	if spot_data.has("sets"):
 		GameState.set_flag(spot_data["sets"])
+	if spot_data.has("gives"):
+		GameState.add_item(spot_data["gives"])
 	if spot_data.has("exit"):
 		exit_requested.emit(spot_data["exit"])
 	elif spot_data.has("text"):

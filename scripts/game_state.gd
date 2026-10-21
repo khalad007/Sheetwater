@@ -40,6 +40,27 @@ func add_item(item_id: String) -> void:
 
 func has_item(item_id: String) -> bool:
 	return items.has(item_id)
+	
+## Conditions are strings: "flag:name", "item:name", optionally prefixed "!".
+func check(cond: String) -> bool:
+	var negate: bool = cond.begins_with("!")
+	var body: String = cond.substr(1) if negate else cond
+	var result: bool
+	if body.begins_with("flag:"):
+		result = has_flag(body.substr(5))
+	elif body.begins_with("item:"):
+		result = has_item(body.substr(5))
+	else:
+		push_warning("GameState.check: bad condition '%s'" % cond)
+		return false
+	return result != negate
+
+
+func check_all(conds: Array) -> bool:
+	for c in conds:
+		if not check(str(c)):
+			return false
+	return true
 
 
 func enter_room(room_id: String) -> void:
