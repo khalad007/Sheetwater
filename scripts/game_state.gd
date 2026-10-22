@@ -91,5 +91,19 @@ func dump() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
-	if key and key.pressed and not key.echo and key.keycode == KEY_F3 and OS.is_debug_build():
+	if key == null or not key.pressed or key.echo or not OS.is_debug_build():
+		return
+	if key.keycode == KEY_F3:
 		dump()
+	elif key.keycode == KEY_F4:
+		_debug_give_next_piece()
+
+
+## Debug only (F4): give the next missing girl piece, so you can test her.
+func _debug_give_next_piece() -> void:
+	for f: Dictionary in GirlData.FEATURES:
+		if not has_item(f["item"]):
+			add_item(f["item"])
+			print("DEBUG gave ", f["item"])
+			return
+	print("DEBUG: the girl already has every piece")

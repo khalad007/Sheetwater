@@ -5,6 +5,8 @@ extends RefCounted
 ##   color     placeholder background colour (hex string)
 ##   bg        path to a 640x360 PNG; used automatically once the file exists
 ##   hotspots  list of clickable areas. Each has:
+##   girl      optional {"pos": [x, y], "show_if": [conditions]}: the faceless girl,
+##             top-left of her 48x96 box, in 640x360 space. Keep her at a frame edge.
 ##       id, label, rect [x, y, width, height] in 640x360 space
 ##       and EITHER "text" (caption) OR "exit" (room id to go to)
 ##     optional:
@@ -23,6 +25,7 @@ const ROOMS: Dictionary = {
 		"title": "Bus Stop",
 		"color": "#1b2430",
 		"bg": "res://art/bg_bus_stop.png",
+		"girl": {"pos": [4, 200]},      # in "bus_stop"
 		"hotspots": [
 			{"id": "sign", "label": "Sign", "rect": [40, 110, 60, 130],
 				"text": "The sign has no name on it.", "sets": "read_sign"},
@@ -37,6 +40,7 @@ const ROOMS: Dictionary = {
 		"title": "Inn Room",
 		"color": "#2a2018",
 		"bg": "res://art/bg_inn_room.png",
+		"girl": {"pos": [4, 190]},      # in "inn_room"
 		"hotspots": [
 			{"id": "wardrobe", "label": "Wardrobe", "rect": [60, 90, 110, 200],
 				"needs": ["flag:looked_window"],
@@ -57,6 +61,7 @@ const ROOMS: Dictionary = {
 		"title": "Village Lane",
 		"color": "#1d2b27",
 		"bg": "res://art/bg_village_lane.png",
+		"girl": {"pos": [588, 190]},    # in "village_lane"
 		"hotspots": [
 			{"id": "villager", "label": "Villager", "rect": [280, 120, 70, 170],
 				"beat": "villager_1"},

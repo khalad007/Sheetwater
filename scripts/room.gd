@@ -25,6 +25,7 @@ func _ready() -> void:
 		return
 	_data = RoomData.ROOMS[room_id]
 	_build_background()
+	_build_girl()
 	_build_hotspots()
 	_build_hover_label()
 	_build_caption()
@@ -32,6 +33,17 @@ func _ready() -> void:
 	GameState.item_added.connect(_refresh_hotspots.unbind(1))
 	Dialogue.finished.connect(_refresh_hotspots)
 	_refresh_hotspots()
+	
+func _build_girl() -> void:
+	if not _data.has("girl"):
+		return
+	var g: Dictionary = _data["girl"]
+	if not GameState.check_all(g.get("show_if", [])):
+		return
+	var pos: Array = g["pos"]
+	var girl := Girl.new()
+	girl.position = Vector2(pos[0], pos[1])
+	add_child(girl)
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

@@ -15,6 +15,18 @@ const ITEMS: Dictionary = {
 		"name": "Child's drawing",
 		"desc": "A small hand held inside a larger hand. The crayon was pressed hard enough to tear the paper.",
 	},
+	"red_boot": {
+		"name": "Red rain boot",
+		"desc": "A child's boot, still damp inside. The left one. There is no right one.",
+	},
+	"red_coat": {
+		"name": "Red coat",
+		"desc": "Small, with a hood. One sleeve is stiff with dried lake water.",
+	},
+	"voice_tape": {
+		"name": "Recording",
+		"desc": "A tape of a child's voice. Static cuts out one word, every time you play it.",
+	},
 }
 
 const NOTES: Array = [
