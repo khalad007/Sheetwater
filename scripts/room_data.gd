@@ -12,6 +12,7 @@ extends RefCounted
 ##       "locked_text": caption shown when refused (default "Not yet.")
 ##       "sets":        flag name set to true on a successful click
 ##       "gives":       item id added on a successful click; the hotspot then disappears
+##       "beat":        id of a StoryData beat to play (use instead of "text")
 ##       "show_if":     [conditions]  hotspot only exists while all are true
 ##       "hide_if":     [conditions]  hotspot disappears when all are true
 ## Conditions: "flag:name", "item:name", prefix "!" to negate.
@@ -58,7 +59,7 @@ const ROOMS: Dictionary = {
 		"bg": "res://art/bg_village_lane.png",
 		"hotspots": [
 			{"id": "villager", "label": "Villager", "rect": [280, 120, 70, 170],
-				"text": "He turns toward you. There is nothing to see in his face."},
+				"beat": "villager_1"},
 			{"id": "puddle", "label": "Puddle", "rect": [400, 270, 120, 40],
 				"show_if": ["item:child_drawing"],
 				"text": "The puddle is white with salt. It shows only sky."},

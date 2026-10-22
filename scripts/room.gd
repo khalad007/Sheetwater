@@ -30,6 +30,7 @@ func _ready() -> void:
 	_build_caption()
 	GameState.flag_changed.connect(_refresh_hotspots.unbind(2))
 	GameState.item_added.connect(_refresh_hotspots.unbind(1))
+	Dialogue.finished.connect(_refresh_hotspots)
 	_refresh_hotspots()
 
 
@@ -126,6 +127,13 @@ func show_caption(text: String) -> void:
 func _refresh_hotspots() -> void:
 	for spot in _hotspots:
 		spot.refresh()
+	# No hover feedback while a conversation covers the room.
+	if Dialogue.active:
+		_hovered_spot = null
+		for spot in _hotspots:
+			spot.set_hovered(false)
+		_update_hover_label()
+		return
 	# A hotspot may have appeared/disappeared under a stationary mouse.
 	_hovered_spot = null
 	var mouse: Vector2 = get_local_mouse_position()
@@ -153,6 +161,8 @@ func _update_hover_label() -> void:
 
 
 func _on_hotspot_activated(spot_data: Dictionary) -> void:
+	if Dialogue.active:
+		return
 	if not GameState.check_all(spot_data.get("needs", [])):
 		show_caption(str(spot_data.get("locked_text", "Not yet.")))
 		return
@@ -162,5 +172,8 @@ func _on_hotspot_activated(spot_data: Dictionary) -> void:
 		GameState.add_item(spot_data["gives"])
 	if spot_data.has("exit"):
 		exit_requested.emit(spot_data["exit"])
+	elif spot_data.has("beat"):
+		_caption_bg.hide()
+		Dialogue.play(spot_data["beat"])
 	elif spot_data.has("text"):
 		show_caption(spot_data["text"])

@@ -30,4 +30,7 @@ const NOTES: Array = [
 	{"id": "n_drawing",
 		"text": "A child's drawing, in a coat in the wardrobe. A small hand inside a bigger one. I feel like I should know whose it is.",
 		"show_if": ["item:child_drawing"]},
+	{"id": "n_route",
+		"text": "School first, then the lake, then the chapel. Everyone says 'she'. Nobody says her name.",
+		"show_if": ["flag:villager_route"]},
 ]
