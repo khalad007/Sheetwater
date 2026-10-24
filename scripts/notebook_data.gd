@@ -27,6 +27,10 @@ const ITEMS: Dictionary = {
 		"name": "Recording",
 		"desc": "A tape of a child's voice. Static cuts out one word, every time you play it.",
 	},
+	"school_key": {
+		"name": "School key",
+		"desc": "A rusty iron key. The man with the lantern put it in your hand before you asked.",
+	},
 }
 
 const NOTES: Array = [
@@ -57,4 +61,13 @@ const NOTES: Array = [
 	{"id": "n_car",
 		"text": "The wing mirrors on the parked car are painted over. Someone did it recently.",
 		"show_if": ["flag:saw_car_mirrors"]},
+	{"id": "n_school_key",
+		"text": "The man with the lantern gave me the school key without my asking. He said everyone goes there first.",
+		"show_if": ["item:school_key"]},
+	{"id": "n_kept_ready",
+		"text": "The woman says my room is 'kept ready. It always is.' I only arrived this morning.",
+		"show_if": ["flag:talked_woman"]},
+	{"id": "n_ring",
+		"text": "A pale band of skin on my ring finger, as if a ring was taken off. I don't remember wearing one.",
+		"show_if": ["flag:talked_elder"]},
 ]

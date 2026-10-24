@@ -26,6 +26,9 @@ extends RefCounted
 ##       "gives":       item id added on a successful click; the hotspot then disappears
 ##       "show_if":     [conditions]  hotspot only exists while all are true
 ##       "hide_if":     [conditions]  hotspot disappears when all are true
+##       "sprite":      {"art": path, "tint": hex}  hotspot draws a person (see hotspot.gd)
+##       "beat_again":  beat to play on later clicks, once "done_flag" is set
+##       "done_flag":   flag that marks the first conversation as finished
 ## Conditions: "flag:name", "item:name", prefix "!" to negate.
 ## Keep captions to about 150 characters; use a beat for anything longer.
 
@@ -90,17 +93,43 @@ const ROOMS: Dictionary = {
 			{"type": "fog", "alpha": 0.3, "speed": 0.06},
 		],
 		"ambient": "wind",
+		"on_enter": [{"beat": "lane_arrive", "if": ["!flag:lane_seen"]}],
 		"hotspots": [
 			{"id": "car", "label": "Car", "rect": [305, 178, 175, 115],
 				"text": "Both wing mirrors have been painted over, flat grey. The paint is still fresh.",
 				"sets": "saw_car_mirrors"},
-			{"id": "villager", "label": "Villager", "rect": [58, 210, 72, 136],
-				"beat": "villager_1"},
-			{"id": "puddle", "label": "Puddle", "rect": [496, 300, 94, 48],
+			{"id": "puddle", "label": "Puddle", "rect": [140, 336, 105, 24],
 				"show_if": ["item:child_drawing"],
 				"text": "The puddle is white with salt. It shows only sky."},
 			{"id": "inn", "label": "Back to the inn", "rect": [155, 68, 100, 252],
 				"exit": "inn_room"},
+			{"id": "to_school", "label": "Path to the school", "rect": [505, 100, 60, 110],
+				"show_if": ["flag:villager_route"],
+				"needs": ["item:school_key"],
+				"locked_text": "The schoolhouse will be locked. Someone in the lane may have a key.",
+				"exit": "school"},
+			{"id": "old_man", "label": "Old man", "rect": [28, 212, 72, 136],
+				"sprite": {"art": "res://art/villager_2.png", "tint": "#4a5560"},
+				"beat": "villager_1", "done_flag": "talked_old_man", "beat_again": "villager_again"},
+			{"id": "lantern_man", "label": "Man with a lantern", "rect": [262, 236, 56, 106],
+				"sprite": {"art": "res://art/villager_4.png", "tint": "#3f4a40"},
+				"beat": "lamp_1", "done_flag": "talked_lantern", "beat_again": "lamp_again"},
+			{"id": "elder", "label": "Old woman", "rect": [392, 250, 52, 98],
+				"sprite": {"art": "res://art/villager_1.png", "tint": "#52484a"},
+				"beat": "elder_1", "done_flag": "talked_elder", "beat_again": "elder_again"},
+			{"id": "woman", "label": "Woman in an apron", "rect": [486, 214, 72, 136],
+				"sprite": {"art": "res://art/villager_3.png", "tint": "#554b42"},
+				"beat": "woman_1", "done_flag": "talked_woman", "beat_again": "woman_again"},
+		],
+	},
+	"school": {
+		"title": "School",
+		"color": "#222a2e",
+		"bg": "res://art/bg_school.png",
+		"ambient": "wind",
+		"hotspots": [
+			{"id": "back", "label": "Back to the lane", "rect": [215, 325, 210, 35],
+				"exit": "village_lane"},
 		],
 	},
 }
