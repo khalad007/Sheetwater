@@ -13,6 +13,7 @@ func _ready() -> void:
 	Fade.set_black()
 	_load_room(START_ROOM)
 	await Fade.from_black(FADE_TIME)
+	_current.on_shown()
 
 
 func go_to(room_id: String) -> void:
@@ -26,6 +27,7 @@ func go_to(room_id: String) -> void:
 	_load_room(room_id)
 	await Fade.from_black(FADE_TIME)
 	_busy = false
+	_current.on_shown()
 
 
 func _load_room(room_id: String) -> void:

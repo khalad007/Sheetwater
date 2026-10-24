@@ -26,4 +26,27 @@ const BEATS: Dictionary = {
 		"text": "You'll want to start with the school.",
 		"sets": "villager_route",
 	},
+	"arrive": {
+		"text": "The bus pulls away. You were its only passenger, and the seat beside yours stayed empty the whole way.",
+		"sfx": "bus",
+		"sets": "arrived",
+		"next": "arrive_2",
+	},
+	"arrive_2": {
+		"speaker": "Mara",
+		"text": "Eight years old. Last seen by the water. No photo in the file. Someone here must know her.",
+	},
+	"bed_1": {
+		"text": "The bed is made. The pillow still holds a long dent, as if someone just got up.",
+		"next": "bed_2",
+	},
+	"bed_2": {
+		"text": "Your notebook lies open on the blanket. The first line, in your handwriting: 'No mirrors.'",
+		"next": "bed_3",
+	},
+	"bed_3": {
+		"speaker": "Mara",
+		"text": "I don't remember writing that. Must have been on the bus.",
+		"sets": "read_first_line",
+	},
 }

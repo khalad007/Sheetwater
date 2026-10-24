@@ -1,7 +1,9 @@
 class_name RoomView
 extends Control
 ## One room, built entirely from RoomData.
-## Set `room_id` BEFORE adding it to the tree.
+## Set `room_id` BEFORE adding it to the tree. Main calls on_shown() once the fade-in ends.
+## Debug builds: F2 outlines hotspots. With F2 on, hold the RIGHT mouse button and drag
+## to measure a rect (printed to Output and shown in the caption) for room_data.gd.
 
 signal exit_requested(room_id: String)
 
@@ -15,6 +17,9 @@ var _caption_bg: ColorRect
 var _caption_label: Label
 var _caption_timer: Timer
 var _debug: bool = false
+var _debug_overlay: Control
+var _dragging: bool = false
+var _drag_from: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
@@ -26,33 +31,63 @@ func _ready() -> void:
 	_data = RoomData.ROOMS[room_id]
 	_build_background()
 	_build_girl()
+	RoomFx.build(self, _data.get("fx", []))
 	_build_hotspots()
 	_build_hover_label()
 	_build_caption()
+	_build_debug_overlay()
+	_start_ambient()
 	GameState.flag_changed.connect(_refresh_hotspots.unbind(2))
 	GameState.item_added.connect(_refresh_hotspots.unbind(1))
 	Dialogue.finished.connect(_refresh_hotspots)
 	_refresh_hotspots()
-	
-func _build_girl() -> void:
-	if not _data.has("girl"):
-		return
-	var g: Dictionary = _data["girl"]
-	if not GameState.check_all(g.get("show_if", [])):
-		return
-	var pos: Array = g["pos"]
-	var girl := Girl.new()
-	girl.position = Vector2(pos[0], pos[1])
-	add_child(girl)
+
+
+## Called by Main after the fade-in. Plays the first matching "on_enter" beat.
+func on_shown() -> void:
+	for e: Dictionary in _data.get("on_enter", []):
+		if GameState.check_all(e.get("if", [])):
+			Dialogue.play(str(e["beat"]))
+			return
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	# F2 outlines every hotspot with its label. Only in editor/debug builds.
 	var key := event as InputEventKey
 	if key and key.pressed and not key.echo and key.keycode == KEY_F2 and OS.is_debug_build():
 		_debug = not _debug
 		for h in _hotspots:
 			h.debug = _debug
+
+
+func _input(event: InputEvent) -> void:
+	if not (OS.is_debug_build() and _debug) or _debug_overlay == null:
+		return
+	var mb := event as InputEventMouseButton
+	if mb and mb.button_index == MOUSE_BUTTON_RIGHT:
+		if mb.pressed:
+			_drag_from = get_local_mouse_position()
+			_dragging = true
+		elif _dragging:
+			_dragging = false
+			var r: Rect2 = _drag_rect()
+			var text := "[%d, %d, %d, %d]" % [int(r.position.x), int(r.position.y), int(r.size.x), int(r.size.y)]
+			print("RECT ", text)
+			show_caption("rect " + text)
+		_debug_overlay.queue_redraw()
+	elif event is InputEventMouseMotion and _dragging:
+		_debug_overlay.queue_redraw()
+
+
+func _drag_rect() -> Rect2:
+	return Rect2(_drag_from, get_local_mouse_position() - _drag_from).abs()
+
+
+func _draw_debug_rect() -> void:
+	if not _dragging:
+		return
+	var r: Rect2 = _drag_rect()
+	_debug_overlay.draw_rect(r, Color(1, 0.9, 0.2, 0.15), true)
+	_debug_overlay.draw_rect(r, Color(1, 0.9, 0.2), false, 1.0)
 
 
 func _build_background() -> void:
@@ -78,6 +113,18 @@ func _build_background() -> void:
 		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		title.position = Vector2(12, 8)
 		add_child(title)
+
+
+func _build_girl() -> void:
+	if not _data.has("girl"):
+		return
+	var g: Dictionary = _data["girl"]
+	if not GameState.check_all(g.get("show_if", [])):
+		return
+	var pos: Array = g["pos"]
+	var girl := Girl.new()
+	girl.position = Vector2(pos[0], pos[1])
+	add_child(girl)
 
 
 func _build_hotspots() -> void:
@@ -128,6 +175,22 @@ func _build_caption() -> void:
 	_caption_timer.one_shot = true
 	_caption_timer.timeout.connect(_caption_bg.hide)
 	add_child(_caption_timer)
+
+
+func _build_debug_overlay() -> void:
+	_debug_overlay = Control.new()
+	_debug_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_debug_overlay)
+	_debug_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_debug_overlay.draw.connect(_draw_debug_rect)
+
+
+func _start_ambient() -> void:
+	var sound: String = _data.get("ambient", "")
+	if sound == "":
+		Sfx.stop_ambient()
+	else:
+		Sfx.play_ambient(sound, float(_data.get("ambient_db", -8.0)))
 
 
 func show_caption(text: String) -> void:
