@@ -241,6 +241,8 @@ func _on_hotspot_activated(spot_data: Dictionary) -> void:
 	if not GameState.check_all(spot_data.get("needs", [])):
 		show_caption(str(spot_data.get("locked_text", "Not yet.")))
 		return
+	if spot_data.has("sfx"):
+		Sfx.play(spot_data["sfx"])
 	if spot_data.has("sets"):
 		GameState.set_flag(spot_data["sets"])
 	if spot_data.has("gives"):

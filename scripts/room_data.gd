@@ -23,6 +23,7 @@ extends RefCounted
 ##       "needs":       [conditions]  all must be true or the click is refused
 ##       "locked_text": caption shown when refused (default "Not yet.")
 ##       "sets":        flag name set to true on a successful click
+##       "sfx":         sound name played on a successful click (res://audio/<name>.wav)
 ##       "gives":       item id added on a successful click; the hotspot then disappears
 ##       "show_if":     [conditions]  hotspot only exists while all are true
 ##       "hide_if":     [conditions]  hotspot disappears when all are true
@@ -126,10 +127,53 @@ const ROOMS: Dictionary = {
 		"title": "School",
 		"color": "#222a2e",
 		"bg": "res://art/bg_school.png",
+		"girl": {"pos": [4, 200]},
+		"fx": [
+			{"type": "fog", "alpha": 0.25, "speed": 0.05},
+			{"type": "rain", "amount": 90, "alpha": 0.25},
+		],
 		"ambient": "wind",
 		"hotspots": [
+			{"id": "swing", "label": "Swing", "rect": [48, 130, 168, 132],
+				"text": "The swings are moving a little, though there is no wind."},
+			{"id": "bell", "label": "School bell", "rect": [325, 128, 42, 155],
+				"sfx": "school_bell",
+				"text": "You pull the rope. The bell rings once, a moment after your hand has let go."},
+			{"id": "hooks", "label": "Coat hooks", "rect": [485, 160, 85, 45],
+				"text": "A row of hooks at child height, name tags faded to blank. One hook is empty, its tag torn away.",
+				"sets": "saw_hooks"},
+			{"id": "boot", "label": "Red boot", "rect": [505, 275, 36, 30],
+				"text": "Under the empty hook: a small red rain boot, still damp inside. Just one.",
+				"gives": "red_boot"},
+			{"id": "to_lake", "label": "Path to the lake", "rect": [215, 165, 105, 70],
+				"needs": ["item:red_boot"],
+				"locked_text": "There is something small in this schoolhouse I haven't found yet.",
+				"exit": "lake_shore"},
 			{"id": "back", "label": "Back to the lane", "rect": [215, 325, 210, 35],
 				"exit": "village_lane"},
+		],
+	},
+	"lake_shore": {
+		"title": "Lake Shore",
+		"color": "#26323a",
+		"bg": "res://art/bg_lake_shore.png",
+		"girl": {"pos": [560, 175]},
+		"fx": [
+			{"type": "fog", "alpha": 0.45, "speed": 0.04, "scale": 2.4},
+		],
+		"ambient": "lake_hush",
+		"on_enter": [{"beat": "phone_buzz", "if": ["!flag:phone_buzzed"]}],
+		"hotspots": [
+			{"id": "water", "label": "The water", "rect": [60, 215, 420, 70],
+				"text": "The lake is a flat pale sheet. Not the sky, not the reeds, not even the jetty shows in it.",
+				"sets": "saw_water"},
+			{"id": "recorder", "label": "Tape recorder", "rect": [330, 195, 90, 45],
+				"beat": "tape_1", "gives": "voice_tape"},
+			{"id": "coat", "label": "Red coat", "rect": [440, 160, 50, 60],
+				"text": "A small red coat folded over the jetty rail. One sleeve is stiff with dried lake water.",
+				"gives": "red_coat"},
+			{"id": "back", "label": "Back to the school", "rect": [215, 325, 210, 35],
+				"exit": "school"},
 		],
 	},
 }

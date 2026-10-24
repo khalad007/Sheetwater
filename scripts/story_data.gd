@@ -160,4 +160,24 @@ const BEATS: Dictionary = {
 		"speaker": "Old woman",
 		"text": "Cold hands. Kind hands.",
 	},
+		# ---------- lake shore ----------
+	"phone_buzz": {
+		"text": "Your phone buzzes once against your hip. The screen is dark: no signal, no caller. It hasn't had a signal since the bus.",
+		"sfx": "phone_buzz",
+		"sets": "phone_buzzed",
+	},
+	"tape_1": {
+		"text": "At the end of the jetty sits a small cassette recorder, its case beaded with water. A tape is already inside. Your thumb finds PLAY before you decide to press it.",
+		"sfx": "tape_click",
+		"next": "tape_2",
+	},
+	"tape_2": {
+		"text": "A child's voice, thin through the static: 'Are you still on the phone? I'm going down to look at the water. I won't go in. I'll be right back, [static].'",
+		"next": "tape_3",
+	},
+	"tape_3": {
+		"speaker": "Mara",
+		"text": "Again. ...Again. The static eats the same word every time. I know that voice. Why do I know that voice?",
+		"sets": "played_tape",
+	},
 }
