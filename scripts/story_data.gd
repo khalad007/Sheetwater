@@ -173,6 +173,7 @@ const BEATS: Dictionary = {
 	},
 	"tape_2": {
 		"text": "A child's voice, thin through the static: 'Are you still on the phone? I'm going down to look at the water. I won't go in. I'll be right back, [static].'",
+		"sfx": "tape_voice",
 		"next": "tape_3",
 	},
 	"tape_3": {

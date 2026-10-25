@@ -81,3 +81,33 @@ func stop_ambient() -> void:
 func toggle_mute() -> void:
 	muted = not muted
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), muted)
+	
+
+
+# ---------- debug: audition every sound with the ] key ----------
+var _audition_names: Array[String] = []
+var _audition_index: int = -1
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.keycode == KEY_BRACKETRIGHT and OS.is_debug_build():
+		_audition_next()
+
+
+func _audition_next() -> void:
+	if _audition_names.is_empty():
+		for f: String in DirAccess.get_files_at(AUDIO_DIR):
+			if f.get_extension() in ["wav", "ogg", "mp3"]:
+				_audition_names.append(f.get_basename())
+		_audition_names.sort()
+	if _audition_names.is_empty():
+		print("Sfx audition: nothing in ", AUDIO_DIR)
+		return
+	_audition_index = (_audition_index + 1) % _audition_names.size()
+	var sound: String = _audition_names[_audition_index]
+	for p in _voices:
+		p.stop()
+	stop_ambient()
+	print("AUDITION %d/%d: %s" % [_audition_index + 1, _audition_names.size(), sound])
+	play(sound)

@@ -280,6 +280,10 @@ func _on_hotspot_activated(spot_data: Dictionary) -> void:
 		return
 	if spot_data.has("sfx"):
 		Sfx.play(spot_data["sfx"])
+	if spot_data.has("sfx"):
+		Sfx.play(spot_data["sfx"])
+	elif spot_data.has("exit"):
+		Sfx.play("footsteps", -4.0)
 	if spot_data.has("sets"):
 		GameState.set_flag(spot_data["sets"])
 	if spot_data.has("gives"):
