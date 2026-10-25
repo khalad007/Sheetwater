@@ -12,7 +12,7 @@ var _tween: Tween
 
 func _ready() -> void:
 	layer = 100
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_rect = ColorRect.new()
 	_rect.color = Color(0, 0, 0, 0)
 	_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE

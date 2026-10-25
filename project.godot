@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Sheetwater"
-run/main_scene="uid://c6lsdrbbvljqp"
+run/main_scene="uid://c05tudw2mm8vy"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -23,6 +23,8 @@ Fade="*uid://cc1jc776arfjo"
 Notebook="*uid://63cl3svknqrh"
 Dialogue="*uid://hgo4mw0x0gxg"
 Ending="*uid://dno4xs1h0wavx"
+Meta="*uid://cj00poljphcm4"
+PauseMenu="*uid://d2ahn03adilne"
 
 [display]
 

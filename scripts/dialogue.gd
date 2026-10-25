@@ -29,7 +29,7 @@ var _choices: VBoxContainer
 
 func _ready() -> void:
 	layer = 40   # above rooms, below Notebook (50) and Fade (100)
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	set_process(false)
 	_theme = Theme.new()
 	_theme.default_font_size = 14

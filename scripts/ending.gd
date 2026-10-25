@@ -20,7 +20,7 @@ var _leaving: bool = false
 
 func _ready() -> void:
 	layer = 90   # above Dialogue (40) and Notebook (50), below Fade (100)
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_theme = Theme.new()
 	_theme.default_font_size = 14
 	_build_ui()
@@ -35,6 +35,7 @@ func start(id: String) -> void:
 		push_error("Ending: unknown ending '%s'" % id)
 		return
 	active = true
+	Meta.mark_ending(id)
 	_leaving = false
 	var e: Dictionary = EndingData.ENDINGS[id]
 	GameState.record_ending(id)

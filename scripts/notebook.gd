@@ -27,7 +27,7 @@ var _enabled: bool = true
 
 func _ready() -> void:
 	layer = 50   # above rooms, below Fade (100)
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_theme = Theme.new()
 	_theme.default_font_size = 12
 	_build_button()
@@ -66,6 +66,10 @@ func open() -> void:
 	_show_tab(true)
 	_overlay.show()
 	_open = true
+
+
+func is_open() -> bool:
+	return _open
 
 
 func close() -> void:

@@ -12,6 +12,8 @@ var _busy: bool = false
 
 
 func _ready() -> void:
+	PauseMenu.enabled = true
+	Notebook.set_enabled(true)
 	Fade.set_black()
 	_load_room(START_ROOM)
 	await Fade.from_black(FADE_TIME)
