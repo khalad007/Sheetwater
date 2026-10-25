@@ -15,6 +15,7 @@ var active: bool = false
 
 var _beat: Dictionary = {}
 var _next_id: String = ""
+var _pending_ending: String = ""
 var _typing: bool = false
 var _awaiting_choice: bool = false
 var _progress: float = 0.0
@@ -82,6 +83,7 @@ func _show_beat(beat_id: String) -> void:
 	if _beat.has("sfx"):
 		Sfx.play(_beat["sfx"])
 	_next_id = _beat.get("next", "")
+	_pending_ending = _beat.get("ending", "")
 	_clear_choices()
 	_awaiting_choice = false
 	var who: String = _beat.get("speaker", "")
@@ -168,8 +170,13 @@ func _end() -> void:
 	set_process(false)
 	_clear_choices()
 	_root.hide()
-	Notebook.set_enabled(true)
+	var ending: String = _pending_ending
+	_pending_ending = ""
+	if ending == "":
+		Notebook.set_enabled(true)
 	finished.emit()
+	if ending != "":
+		Ending.start(ending)
 
 
 # ---------- building the UI ----------

@@ -4,6 +4,7 @@ extends Control
 ## Set `room_id` BEFORE adding it to the tree. Main calls on_shown() once the fade-in ends.
 ## Debug builds: F2 outlines hotspots. With F2 on, hold the RIGHT mouse button and drag
 ## to measure a rect (printed to Output and shown in the caption) for room_data.gd.
+## "bgs" lets a room change its background in place when flags change (see room_data.gd).
 
 signal exit_requested(room_id: String)
 
@@ -20,6 +21,10 @@ var _debug: bool = false
 var _debug_overlay: Control
 var _dragging: bool = false
 var _drag_from: Vector2 = Vector2.ZERO
+var _bg_pic: TextureRect
+var _bg_title: Label
+var _bg_path: String = ""
+var _bg_swapping: bool = false
 
 
 func _ready() -> void:
@@ -40,6 +45,8 @@ func _ready() -> void:
 	GameState.flag_changed.connect(_refresh_hotspots.unbind(2))
 	GameState.item_added.connect(_refresh_hotspots.unbind(1))
 	Dialogue.finished.connect(_refresh_hotspots)
+	if _data.has("bgs"):
+		GameState.flag_changed.connect(_on_bg_flag)
 	_refresh_hotspots()
 
 
@@ -90,6 +97,8 @@ func _draw_debug_rect() -> void:
 	_debug_overlay.draw_rect(r, Color(1, 0.9, 0.2), false, 1.0)
 
 
+# ---------- background ----------
+
 func _build_background() -> void:
 	var fill := ColorRect.new()
 	fill.color = Color(str(_data.get("color", "#111111")))
@@ -97,23 +106,51 @@ func _build_background() -> void:
 	add_child(fill)
 	fill.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	var bg_path: String = _data.get("bg", "")
-	if bg_path != "" and ResourceLoader.exists(bg_path):
-		var pic := TextureRect.new()
-		pic.texture = load(bg_path) as Texture2D
-		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		pic.stretch_mode = TextureRect.STRETCH_SCALE
-		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(pic)
-		pic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	else:
-		var title := Label.new()
-		title.text = str(_data.get("title", room_id)).to_upper()
-		title.modulate = Color(1, 1, 1, 0.25)
-		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		title.position = Vector2(12, 8)
-		add_child(title)
+	_bg_pic = TextureRect.new()
+	_bg_pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_bg_pic.stretch_mode = TextureRect.STRETCH_SCALE
+	_bg_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg_pic)
+	_bg_pic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
+	_bg_title = Label.new()
+	_bg_title.text = str(_data.get("title", room_id)).to_upper()
+	_bg_title.modulate = Color(1, 1, 1, 0.25)
+	_bg_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bg_title.position = Vector2(12, 8)
+	add_child(_bg_title)
+
+	_apply_bg()
+
+
+func _current_bg_path() -> String:
+	for b: Dictionary in _data.get("bgs", []):
+		if GameState.check_all(b.get("if", [])):
+			return str(b["bg"])
+	return str(_data.get("bg", ""))
+
+
+func _apply_bg() -> void:
+	_bg_path = _current_bg_path()
+	var has_art: bool = _bg_path != "" and ResourceLoader.exists(_bg_path)
+	_bg_pic.visible = has_art
+	_bg_title.visible = not has_art
+	if has_art:
+		_bg_pic.texture = load(_bg_path) as Texture2D
+
+
+func _on_bg_flag(_flag: String, _value: Variant) -> void:
+	if _bg_swapping:
+		return
+	_bg_swapping = true
+	while _current_bg_path() != _bg_path:
+		await Fade.to_black(0.25)
+		_apply_bg()
+		await Fade.from_black(0.5)
+	_bg_swapping = false
+
+
+# ---------- other layers ----------
 
 func _build_girl() -> void:
 	if not _data.has("girl"):

@@ -180,4 +180,131 @@ const BEATS: Dictionary = {
 		"text": "Again. ...Again. The static eats the same word every time. I know that voice. Why do I know that voice?",
 		"sets": "played_tape",
 	},
+		# ---------- inn revisit: the notebooks ----------
+	"nb_enter": {
+		"text": "The room is the same. The bed is the same. But the floor is wrong: something is packed tight under the bed and along the wall, hundreds of small things stacked on one another.",
+		"sets": "nb_room_seen",
+	},
+	"pile_1": {
+		"text": "You kneel. They are notebooks, small and black, identical to the one in your pocket. Hundreds of them, stacked under the bed and all the way to the wardrobe.",
+		"next": "pile_2",
+	},
+	"pile_2": {
+		"text": "You open the top one. Your own handwriting, small and cramped. 'Day 1. Arrived. No mirrors. Don't let me look.'",
+		"next": "pile_3",
+	},
+	"pile_3": {
+		"text": "Another, from deeper in the pile. 'Day 1. Arrived. No mirrors. Found a boot at the school.' The day is the same. It is always 'Day 1.'",
+		"next": "pile_4",
+	},
+	"pile_4": {
+		"text": "'Day 1. Found a boot, a coat. Went to the lake. I couldn't stay by the water. I came back here and wrote this down so I wouldn't forget.'",
+		"next": "pile_5",
+	},
+	"pile_5": {
+		"text": "One near the bottom is swollen, as if it had been wet. 'Day 1. I got as far as the chapel. There is a sheet over something.' The line stops there.",
+		"next": "pile_6",
+	},
+	"pile_6": {
+		"speaker": "Mara",
+		"text": "Somebody is copying my handwriting. That's the only explanation. Somebody wants me frightened.",
+		"next": "pile_7",
+	},
+	"pile_7": {
+		"speaker": "Mara",
+		"text": "I've never been in this room before today. I arrived this morning.",
+		"sets": "found_notebooks",
+	},
+	"pile_again": {
+		"speaker": "Mara",
+		"text": "Hundreds of 'Day 1'. I put the notebook back where I found it. I'm not reading any more of these.",
+	},
+		# ---------- chapel ----------
+	"chapel_enter": {
+		"text": "The chapel door opens at a touch. The aisle has been swept, the candles trimmed, every pew dusted, as if the whole village rehearsed this room. At the far wall stands something tall under a white sheet.",
+		"sets": "chapel_seen",
+	},
+
+	# ---------- the mirror ----------
+	"mirror_1": {
+		"text": "The sheet hangs from the top of the frame, the only white thing in the chapel. The light from the high window stops exactly at its hem.",
+		"sets": "mirror_seen",
+		"next": "mirror_2",
+	},
+	"mirror_2": {
+		"speaker": "Mara",
+		"text": "A boot. A coat. A drawing. A voice. It all fits in my hands. Everything in this village sent me to this one spot.",
+		"next": "mirror_3",
+	},
+	"mirror_3": {
+		"text": "Behind you, very close, someone small is breathing. When you hold still, she holds still.",
+		"next": "mirror_choice",
+	},
+	"mirror_again": {
+		"text": "The sheet hangs without moving. Behind you, the small footsteps wait.",
+		"next": "mirror_choice",
+	},
+	"mirror_choice": {
+		"text": "In your pocket the notebook has fallen open on its own. The first line, in your own handwriting: 'No mirrors. Don't let me look.'",
+		"choices": [
+			{"text": "Lift the sheet.", "next": "look_1"},
+			{"text": "Turn away.", "next": "away_1"},
+			{"text": "Not yet."},
+		],
+	},
+
+	# ---------- ending: she looked ----------
+	"look_1": {
+		"text": "You take the hem in both hands. The cloth slides down and pools at your feet, soft as a breath. The glass is dusty and dark. It shows the empty chapel, and you are standing right in front of it.",
+		"sfx": "cloth_pull",
+		"sets": "sheet_off",
+		"next": "look_2",
+	},
+	"look_2": {
+		"text": "Then the glass clears, slowly, like breath fading off a window. A tired woman in a grey coat, short dark hair, eyes red from crying. You saw her once before, a year ago, and it was more than you could bear.",
+		"sfx": "music_box",
+		"sets": "reflection",
+		"next": "look_3",
+	},
+	"look_3": {
+		"text": "And at her shoulder, close enough to touch, a small girl in a red hooded coat. She has a face. She is smiling at you.",
+		"next": "look_4",
+	},
+	"look_4": {
+		"speaker": "Mara",
+		"text": "Elise.",
+		"next": "look_5",
+	},
+	"look_5": {
+		"speaker": "Elise",
+		"text": "Mama. You looked.",
+		"sfx": "girl_last_words",
+		"next": "look_6",
+	},
+	"look_6": {
+		"speaker": "Elise",
+		"text": "It was only forty seconds. You can stop counting now.",
+		"next": "look_7",
+	},
+	"look_7": {
+		"text": "You stay until the sun reaches the glass. When you finally turn, there is nobody behind you. The chapel door stands open, and far down the path the lake holds the whole sky.",
+		"sets": "ending_look",
+		"ending": "look",
+	},
+
+	# ---------- ending: she looked away ----------
+	"away_1": {
+		"text": "You turn your back on the sheet. It hangs there, patient as the whole village. Behind you, small footsteps come close, stop, and wait.",
+		"next": "away_2",
+	},
+	"away_2": {
+		"speaker": "Mara",
+		"text": "I should check the notebook. I should write something down.",
+		"next": "away_3",
+	},
+	"away_3": {
+		"text": "In the lane, a bus idles. The driver never honks. He never has to.",
+		"sets": "ending_away",
+		"ending": "away",
+	},
 }

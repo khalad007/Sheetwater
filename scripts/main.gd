@@ -1,5 +1,7 @@
 extends Control
 ## Host: owns exactly one room at a time and swaps it with a fade.
+## Room ids pass through RoomData.resolve(), so variants apply to every entry point.
+## Debug builds: F7 gives every item, sets the story flags and jumps to the chapel.
 
 const ROOM_SCENE: PackedScene = preload("res://scenes/room.tscn")
 const START_ROOM: String = "bus_stop"
@@ -14,6 +16,22 @@ func _ready() -> void:
 	_load_room(START_ROOM)
 	await Fade.from_black(FADE_TIME)
 	_current.on_shown()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key and key.pressed and not key.echo and key.keycode == KEY_F7 and OS.is_debug_build():
+		_debug_jump_to_chapel()
+
+
+func _debug_jump_to_chapel() -> void:
+	if Dialogue.active or Ending.active or _busy:
+		return
+	for item: String in ["room_key", "school_key", "red_boot", "red_coat", "child_drawing", "voice_tape"]:
+		GameState.add_item(item)
+	for flag: String in ["villager_route", "phone_buzzed", "played_tape", "nb_room_seen", "found_notebooks"]:
+		GameState.set_flag(flag)
+	go_to("chapel")
 
 
 func go_to(room_id: String) -> void:
@@ -31,12 +49,13 @@ func go_to(room_id: String) -> void:
 
 
 func _load_room(room_id: String) -> void:
+	var actual: String = RoomData.resolve(room_id)
 	if _current:
 		_current.queue_free()
 		_current = null
 	var room: RoomView = ROOM_SCENE.instantiate()
-	room.room_id = room_id
+	room.room_id = actual
 	room.exit_requested.connect(go_to)
 	add_child(room)
 	_current = room
-	GameState.enter_room(room_id)
+	GameState.enter_room(actual)

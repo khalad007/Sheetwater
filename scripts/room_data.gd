@@ -4,6 +4,12 @@ extends RefCounted
 ##   title     placeholder label shown while there is no background art
 ##   color     placeholder background colour (hex string)
 ##   bg        path to a 640x360 PNG; used automatically once the file exists
+##   variants  optional list of {"if": [conditions], "room": id}: when this room is
+##             entered, the first entry whose conditions pass is loaded instead
+##             (RoomData.resolve). The variant room is a full room of its own.
+##   bgs       optional list of {"if": [conditions], "bg": path}: the first entry whose
+##             conditions pass replaces "bg", and the room swaps backgrounds in place
+##             (with a quick blink) whenever a flag changes. Put the most specific first.
 ##   girl      optional {"pos": [x, y], "show_if": [conditions]}: the faceless girl,
 ##             top-left of her 48x96 box, in 640x360 space. Keep her at a frame edge.
 ##   fx        optional list of atmosphere layers drawn over the room (see RoomFx):
@@ -62,6 +68,7 @@ const ROOMS: Dictionary = {
 		"title": "Inn Room",
 		"color": "#2a2018",
 		"bg": "res://art/bg_inn_room.png",
+		"variants": [{"if": ["flag:played_tape"], "room": "inn_notebooks"}],
 		"girl": {"pos": [4, 190]},
 		"fx": [
 			{"type": "flicker", "depth": 0.3},
@@ -109,6 +116,9 @@ const ROOMS: Dictionary = {
 				"needs": ["item:school_key"],
 				"locked_text": "The schoolhouse will be locked. Someone in the lane may have a key.",
 				"exit": "school"},
+			{"id": "to_chapel", "label": "Path to the chapel", "rect": [440, 108, 60, 62],
+				"show_if": ["flag:found_notebooks"],
+				"exit": "chapel"},
 			{"id": "old_man", "label": "Old man", "rect": [28, 212, 72, 136],
 				"sprite": {"art": "res://art/villager_2.png", "tint": "#4a5560"},
 				"beat": "villager_1", "done_flag": "talked_old_man", "beat_again": "villager_again"},
@@ -164,16 +174,97 @@ const ROOMS: Dictionary = {
 		"ambient": "lake_hush",
 		"on_enter": [{"beat": "phone_buzz", "if": ["!flag:phone_buzzed"]}],
 		"hotspots": [
-			{"id": "water", "label": "The water", "rect": [60, 215, 420, 70],
-				"text": "The lake is a flat pale sheet. Not the sky, not the reeds, not even the jetty shows in it.",
+			{"id": "water", "label": "The water", "rect": [10, 182, 330, 92],
+				"text": "The lake is a flat pale sheet. Not the sky, not the reeds, not even the far shore shows in it.",
 				"sets": "saw_water"},
-			{"id": "recorder", "label": "Tape recorder", "rect": [330, 195, 90, 45],
+			{"id": "recorder", "label": "Tape recorder", "rect": [343, 208, 48, 32],
 				"beat": "tape_1", "gives": "voice_tape"},
-			{"id": "coat", "label": "Red coat", "rect": [440, 160, 50, 60],
-				"text": "A small red coat folded over the jetty rail. One sleeve is stiff with dried lake water.",
+			{"id": "coat", "label": "Red coat", "rect": [443, 200, 46, 36],
+				"text": "A small red coat folded over the bench at the end of the jetty. One sleeve is stiff with dried lake water.",
 				"gives": "red_coat"},
 			{"id": "back", "label": "Back to the school", "rect": [215, 325, 210, 35],
 				"exit": "school"},
 		],
 	},
+	"inn_notebooks": {
+		"title": "Inn Room",
+		"color": "#241c16",
+		"bg": "res://art/bg_inn_notebooks.png",
+		"girl": {"pos": [4, 190]},
+		"fx": [
+			{"type": "flicker", "depth": 0.4},
+		],
+		"ambient": "drip",
+		"on_enter": [{"beat": "nb_enter", "if": ["!flag:nb_room_seen"]}],
+		"hotspots": [
+			{"id": "window", "label": "Window", "rect": [285, 86, 71, 93],
+				"text": "Frosted glass. Nothing but pale light.", "sets": "looked_window"},
+			{"id": "wardrobe", "label": "Wardrobe", "rect": [25, 51, 145, 247],
+				"needs": ["flag:looked_window"],
+				"locked_text": "The door sticks. Something rattles inside. You need more light.",
+				"text": "In a coat pocket: a child's drawing of a hand held inside a larger hand.",
+				"gives": "child_drawing"},
+			{"id": "door", "label": "Door to the lane", "rect": [534, 41, 70, 262],
+				"needs": ["item:room_key"],
+				"locked_text": "The door is locked.",
+				"exit": "village_lane"},
+			{"id": "bed", "label": "Bed", "rect": [198, 191, 244, 100],
+				"text": "You can't bring yourself to lie down. Not with the floor like that."},
+			{"id": "back", "label": "Back to the bus stop", "rect": [325, 310, 125, 45],
+				"exit": "bus_stop"},
+			{"id": "pile", "label": "Notebooks", "rect": [160, 72, 118, 114],
+				"sfx": "paper_rustle",
+				"beat": "pile_1", "done_flag": "found_notebooks", "beat_again": "pile_again"},
+		],
+	},
+	"chapel": {
+		"title": "Chapel",
+		"color": "#20242a",
+		"bg": "res://art/bg_chapel.png",
+		"girl": {"pos": [588, 190]},
+		"fx": [
+			{"type": "fog", "alpha": 0.15, "speed": 0.03},
+		],
+		"ambient": "chapel_hush",
+		"on_enter": [{"beat": "chapel_enter", "if": ["!flag:chapel_seen"]}],
+		"hotspots": [
+			{"id": "window", "label": "High window", "rect": [388, 18, 46, 140],
+				"text": "Clear glass, the first in the village. One long bar of light falls from it across the pews.",
+				"sets": "saw_chapel_window"},
+			{"id": "mirror", "label": "The covered mirror", "rect": [186, 124, 80, 122],
+				"needs": ["item:red_boot", "item:red_coat", "item:child_drawing", "item:voice_tape"],
+				"locked_text": "The sheet won't stir. Something of her is still missing: her feet, her coat, her hands, her voice.",
+				"exit": "mirror"},
+			{"id": "pews", "label": "Pews", "rect": [80, 250, 245, 70],
+				"text": "Every bench is worn smooth in the same few places, as if the whole village sits here each morning, waiting."},
+			{"id": "back", "label": "Back to the lane", "rect": [215, 325, 210, 35],
+				"exit": "village_lane"},
+		],
+	},
+	"mirror": {
+		"title": "The Mirror",
+		"color": "#14161a",
+		"bg": "res://art/bg_mirror_covered.png",
+		"bgs": [
+			{"if": ["flag:reflection"], "bg": "res://art/bg_mirror_reveal.png"},
+			{"if": ["flag:sheet_off"], "bg": "res://art/bg_mirror_bare.png"},
+		],
+		"ambient": "chapel_hush",
+		"hotspots": [
+			{"id": "sheet", "label": "The sheet", "rect": [228, 22, 177, 332],
+				"hide_if": ["flag:sheet_off"],
+				"beat": "mirror_1", "done_flag": "mirror_seen", "beat_again": "mirror_again"},
+			{"id": "back", "label": "Step back", "rect": [30, 336, 160, 24],
+				"exit": "chapel"},
+		],
+	},
 }
+
+
+## Returns the room that should actually load for room_id (see "variants").
+static func resolve(room_id: String) -> String:
+	var data: Dictionary = ROOMS.get(room_id, {})
+	for v: Dictionary in data.get("variants", []):
+		if GameState.check_all(v.get("if", [])):
+			return str(v["room"])
+	return room_id
