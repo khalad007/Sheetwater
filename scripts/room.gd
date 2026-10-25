@@ -289,9 +289,18 @@ func _on_hotspot_activated(spot_data: Dictionary) -> void:
 	elif spot_data.has("beat"):
 		_caption_bg.hide()
 		var beat: String = spot_data["beat"]
+		for alt: Dictionary in spot_data.get("beat_if", []):
+			if GameState.check_all(alt.get("if", [])):
+				beat = str(alt["beat"])
+				break
 		var done: String = spot_data.get("done_flag", "")
 		if done != "" and GameState.has_flag(done) and spot_data.has("beat_again"):
 			beat = spot_data["beat_again"]
 		Dialogue.play(beat)
 	elif spot_data.has("text"):
-		show_caption(spot_data["text"])
+		var text: String = spot_data["text"]
+		for alt: Dictionary in spot_data.get("text_if", []):
+			if GameState.check_all(alt.get("if", [])):
+				text = str(alt["text"])
+				break
+		show_caption(text)

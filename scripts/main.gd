@@ -20,8 +20,25 @@ func _ready() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
-	if key and key.pressed and not key.echo and key.keycode == KEY_F7 and OS.is_debug_build():
+	if key == null or not key.pressed or key.echo or not OS.is_debug_build():
+		return
+	if key.keycode == KEY_F7:
 		_debug_jump_to_chapel()
+	elif key.keycode == KEY_F8:
+		_debug_new_loop(false)
+	elif key.keycode == KEY_F9:
+		_debug_new_loop(true)
+
+
+## Debug only. F8: start a fresh loop. F9: same, but "She Looked Away" counts as already seen.
+func _debug_new_loop(with_away: bool) -> void:
+	if Dialogue.active or Ending.active or _busy:
+		return
+	if with_away:
+		GameState.record_ending("away")
+	GameState.new_loop()
+	Notebook.reset()
+	get_tree().reload_current_scene()
 
 
 func _debug_jump_to_chapel() -> void:

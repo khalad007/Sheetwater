@@ -307,4 +307,97 @@ const BEATS: Dictionary = {
 		"sets": "ending_away",
 		"ending": "away",
 	},
+		# ---------- replay variants (loop 2 and later) ----------
+	"arrive_loop": {
+		"text": "The bus pulls away. The driver nodded as you stepped off, the way you nod to someone you see every day. The seat beside yours stayed empty the whole way.",
+		"sfx": "bus",
+		"sets": "arrived",
+		"next": "arrive_loop_2",
+	},
+	"arrive_loop_2": {
+		"speaker": "Mara",
+		"text": "Odd. I feel like I've stood on this exact spot before. Long bus rides do that.",
+		"next": "arrive_2",
+	},
+	"bed2_1": {
+		"text": "The bed is made. The pillow still holds a long dent, as if someone just got up.",
+		"next": "bed2_2",
+	},
+	"bed2_2": {
+		"text": "Your notebook lies open on the blanket. 'No mirrors.' The cover is crowded with tiny pencil strokes in rows of five, edge to edge.",
+		"sets": "saw_tally_cover",
+		"next": "bed2_3",
+	},
+	"bed2_3": {
+		"speaker": "Mara",
+		"text": "I don't remember doing that. Must have been the bus. There's nothing else to do on a bus that long.",
+		"sets": "read_first_line",
+	},
+	"lamp2_1": {
+		"text": "A thin man in work overalls holds a lantern, though it's broad daylight. The flame burns low and steady. He is already holding out a key.",
+		"next": "lamp2_2",
+	},
+	"lamp2_2": {
+		"speaker": "Man with the lantern",
+		"text": "Schoolhouse key. You know the door. Lift as you turn it.",
+		"gives": "school_key",
+		"sets": "lamp_slip",
+		"next": "lamp2_3",
+	},
+	"lamp2_3": {
+		"speaker": "Mara",
+		"text": "I've never been inside that school.",
+		"next": "lamp2_4",
+	},
+	"lamp2_4": {
+		"speaker": "Man with the lantern",
+		"text": "No. Of course not. Everyone goes there first.",
+		"sets": "talked_lantern",
+	},
+	"elder2_1": {
+		"text": "An old woman leans on a cane at the corner. She is the only one who holds still while you look at her.",
+		"next": "elder2_2",
+	},
+	"elder2_2": {
+		"speaker": "Old woman",
+		"text": "Cold hands. Kind, but cold. They were warmer when she was little.",
+		"sets": "elder_slip",
+		"next": "elder2_3",
+	},
+	"elder2_3": {
+		"speaker": "Mara",
+		"text": "When who was little? ...And I still don't remember wearing a ring. There's a pale band on my finger.",
+		"next": "elder2_4",
+	},
+	"elder2_4": {
+		"speaker": "Old woman",
+		"text": "Nobody, dear. Old women ramble. Some things you keep in a pocket instead.",
+		"sets": "talked_elder",
+	},
+	"nb_enter_loop": {
+		"text": "The room is the same. The floor is wrong again: notebooks packed under the bed and along the wall. The stacks reach a little higher up the wardrobe than they should, and you can't say how you know that.",
+		"sets": "nb_room_seen",
+	},
+	"pile_away_1": {
+		"text": "You kneel. The same small black notebooks, the same leaning stacks. The top one is warm, as if it was set down a moment ago.",
+		"next": "pile_away_2",
+	},
+	"pile_away_2": {
+		"text": "'Day 1. Arrived. No mirrors. Found a boot, a coat, a drawing, a voice. Went to the chapel. I turned my back on the sheet. I couldn't make myself look.'",
+		"next": "pile_away_3",
+	},
+	"pile_away_3": {
+		"text": "The handwriting is yours. The last line is yours. You have no memory of writing it.",
+		"next": "pile_away_4",
+	},
+	"pile_away_4": {
+		"speaker": "Mara",
+		"text": "Somebody is copying my... Somebody is... No. I should go to the chapel.",
+		"sets": "found_notebooks",
+	},
+	"mirror2_1": {
+		"text": "The sheet hangs from the top of the frame, creased deep along the hem, as if it has been lifted and let fall a great many times. The light from the high window stops exactly at the cloth.",
+		"sets": "mirror_seen",
+		"next": "mirror_2",
+	},
 }

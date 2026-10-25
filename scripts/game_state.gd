@@ -42,6 +42,8 @@ func has_item(item_id: String) -> bool:
 	return items.has(item_id)
 	
 ## Conditions are strings: "flag:name", "item:name", optionally prefixed "!".
+## Conditions are strings: "flag:name", "item:name", "loop:N" (this is loop N or later),
+## "ending:id" (that ending was seen in any run). Prefix "!" to negate.
 func check(cond: String) -> bool:
 	var negate: bool = cond.begins_with("!")
 	var body: String = cond.substr(1) if negate else cond
@@ -50,6 +52,10 @@ func check(cond: String) -> bool:
 		result = has_flag(body.substr(5))
 	elif body.begins_with("item:"):
 		result = has_item(body.substr(5))
+	elif body.begins_with("loop:"):
+		result = loop >= int(body.substr(5))
+	elif body.begins_with("ending:"):
+		result = endings_seen.has(body.substr(7))
 	else:
 		push_warning("GameState.check: bad condition '%s'" % cond)
 		return false

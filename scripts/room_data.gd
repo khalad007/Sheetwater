@@ -35,8 +35,10 @@ extends RefCounted
 ##       "hide_if":     [conditions]  hotspot disappears when all are true
 ##       "sprite":      {"art": path, "tint": hex}  hotspot draws a person (see hotspot.gd)
 ##       "beat_again":  beat to play on later clicks, once "done_flag" is set
+##       "text_if":     [{"if": [conditions], "text": "..."}]  first match replaces "text"
+##       "beat_if":     [{"if": [conditions], "beat": id}]     first match replaces "beat"
 ##       "done_flag":   flag that marks the first conversation as finished
-## Conditions: "flag:name", "item:name", prefix "!" to negate.
+## Conditions: "flag:name", "item:name", "loop:N" (loop N or later), "ending:id" (seen in any run); prefix "!" to negate.
 ## Keep captions to about 150 characters; use a beat for anything longer.
 
 const ROOMS: Dictionary = {
@@ -50,15 +52,21 @@ const ROOMS: Dictionary = {
 			{"type": "rain", "amount": 110, "alpha": 0.28},
 		],
 		"ambient": "wind",
-		"on_enter": [{"beat": "arrive", "if": ["!flag:arrived"]}],
+		"on_enter": [
+			{"beat": "arrive_loop", "if": ["!flag:arrived", "loop:2"]},
+			{"beat": "arrive", "if": ["!flag:arrived"]},
+		],
 		"hotspots": [
 			{"id": "sign", "label": "Sign", "rect": [465, 165, 50, 112],
-				"text": "The sign has no name on it.", "sets": "read_sign"},
+				"text": "The sign has no name on it.",
+				"text_if": [{"if": ["loop:2"], "text": "No name on the sign. Scratched low on the post: rows of strokes, bundled in fives. Too many to count."}],
+				"sets": "read_sign"},
 			{"id": "timetable", "label": "Shelter wall", "rect": [340, 165, 105, 55],
 				"text": "Scratched into the shelter's back wall: a bus timetable. One bus a day. Arrivals only.",
 				"sets": "read_timetable"},
 			{"id": "bench", "label": "Bench", "rect": [335, 222, 110, 75],
 				"text": "Under the bench: a brass key on a paper tag. The tag has no number.",
+				"text_if": [{"if": ["loop:2"], "text": "Under the bench: the brass key. The paper tag is soft with handling, the number rubbed away by a thumb."}],
 				"gives": "room_key"},
 			{"id": "road", "label": "Road to the inn", "rect": [520, 180, 120, 160],
 				"exit": "inn_room"},
@@ -76,7 +84,7 @@ const ROOMS: Dictionary = {
 		"ambient": "drip",
 		"hotspots": [
 			{"id": "bed", "label": "Bed", "rect": [196, 188, 248, 105],
-				"beat": "bed_1"},
+				"beat": "bed_1", "beat_if": [{"if": ["loop:2"], "beat": "bed2_1"}]},
 			{"id": "wardrobe", "label": "Wardrobe", "rect": [21, 53, 147, 295],
 				"needs": ["flag:looked_window"],
 				"locked_text": "The door sticks. Something rattles inside. You need more light.",
@@ -124,10 +132,12 @@ const ROOMS: Dictionary = {
 				"beat": "villager_1", "done_flag": "talked_old_man", "beat_again": "villager_again"},
 			{"id": "lantern_man", "label": "Man with a lantern", "rect": [262, 236, 56, 106],
 				"sprite": {"art": "res://art/villager_4.png", "tint": "#3f4a40"},
-				"beat": "lamp_1", "done_flag": "talked_lantern", "beat_again": "lamp_again"},
+				"beat": "lamp_1", "beat_if": [{"if": ["loop:2"], "beat": "lamp2_1"}],
+				"done_flag": "talked_lantern", "beat_again": "lamp_again"},
 			{"id": "elder", "label": "Old woman", "rect": [392, 250, 52, 98],
 				"sprite": {"art": "res://art/villager_1.png", "tint": "#52484a"},
-				"beat": "elder_1", "done_flag": "talked_elder", "beat_again": "elder_again"},
+				"beat": "elder_1", "beat_if": [{"if": ["loop:2"], "beat": "elder2_1"}],
+				"done_flag": "talked_elder", "beat_again": "elder_again"},
 			{"id": "woman", "label": "Woman in an apron", "rect": [486, 214, 72, 136],
 				"sprite": {"art": "res://art/villager_3.png", "tint": "#554b42"},
 				"beat": "woman_1", "done_flag": "talked_woman", "beat_again": "woman_again"},
@@ -195,7 +205,10 @@ const ROOMS: Dictionary = {
 			{"type": "flicker", "depth": 0.4},
 		],
 		"ambient": "drip",
-		"on_enter": [{"beat": "nb_enter", "if": ["!flag:nb_room_seen"]}],
+		"on_enter": [
+			{"beat": "nb_enter_loop", "if": ["!flag:nb_room_seen", "loop:2"]},
+			{"beat": "nb_enter", "if": ["!flag:nb_room_seen"]},
+		],
 		"hotspots": [
 			{"id": "window", "label": "Window", "rect": [285, 86, 71, 93],
 				"text": "Frosted glass. Nothing but pale light.", "sets": "looked_window"},
@@ -214,7 +227,8 @@ const ROOMS: Dictionary = {
 				"exit": "bus_stop"},
 			{"id": "pile", "label": "Notebooks", "rect": [160, 72, 118, 114],
 				"sfx": "paper_rustle",
-				"beat": "pile_1", "done_flag": "found_notebooks", "beat_again": "pile_again"},
+				"beat": "pile_1", "beat_if": [{"if": ["ending:away"], "beat": "pile_away_1"}],
+				"done_flag": "found_notebooks", "beat_again": "pile_again"},
 		],
 	},
 	"chapel": {
@@ -253,7 +267,8 @@ const ROOMS: Dictionary = {
 		"hotspots": [
 			{"id": "sheet", "label": "The sheet", "rect": [228, 22, 177, 332],
 				"hide_if": ["flag:sheet_off"],
-				"beat": "mirror_1", "done_flag": "mirror_seen", "beat_again": "mirror_again"},
+				"beat": "mirror_1", "beat_if": [{"if": ["loop:2"], "beat": "mirror2_1"}],
+				"done_flag": "mirror_seen", "beat_again": "mirror_again"},
 			{"id": "back", "label": "Step back", "rect": [30, 336, 160, 24],
 				"exit": "chapel"},
 		],
