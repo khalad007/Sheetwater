@@ -52,6 +52,16 @@ const ROOMS: Dictionary = {
 			{"type": "rain", "amount": 110, "alpha": 0.28},
 		],
 		"ambient": "wind",
+		"arrival": {
+			"art": "res://art/bus.png",
+			"if": ["!flag:arrived"],
+			"from": [575, 252],
+			"size": [130, 82],
+			"steps": [
+				{"wait": 1.5},
+				{"to": [548, 236], "scale": 0.85, "time": 0.7, "ease": "in", "alpha": 0.0},
+			],
+		},
 		"on_enter": [
 			{"beat": "arrive_loop", "if": ["!flag:arrived", "loop:2"]},
 			{"beat": "arrive", "if": ["!flag:arrived"]},

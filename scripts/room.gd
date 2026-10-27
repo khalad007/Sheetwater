@@ -25,6 +25,9 @@ var _bg_pic: TextureRect
 var _bg_title: Label
 var _bg_path: String = ""
 var _bg_swapping: bool = false
+var _arrival: Control
+var _arrival_cfg: Dictionary = {}
+var _arrival_tween: Tween
 
 
 func _ready() -> void:
@@ -35,6 +38,7 @@ func _ready() -> void:
 		return
 	_data = RoomData.ROOMS[room_id]
 	_build_background()
+	_build_arrival()
 	_build_girl()
 	RoomFx.build(self, _data.get("fx", []))
 	_build_hotspots()
@@ -52,6 +56,7 @@ func _ready() -> void:
 
 ## Called by Main after the fade-in. Plays the first matching "on_enter" beat.
 func on_shown() -> void:
+	_start_arrival()
 	for e: Dictionary in _data.get("on_enter", []):
 		if GameState.check_all(e.get("if", [])):
 			Dialogue.play(str(e["beat"]))
@@ -60,10 +65,14 @@ func on_shown() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var key := event as InputEventKey
-	if key and key.pressed and not key.echo and key.keycode == KEY_F2 and OS.is_debug_build():
+	if key == null or not key.pressed or key.echo or not OS.is_debug_build():
+		return
+	if key.keycode == KEY_F2:
 		_debug = not _debug
 		for h in _hotspots:
 			h.debug = _debug
+	elif key.keycode == KEY_B:
+		_replay_arrival()
 
 
 func _input(event: InputEvent) -> void:
@@ -308,3 +317,97 @@ func _on_hotspot_activated(spot_data: Dictionary) -> void:
 				text = str(alt["text"])
 				break
 		show_caption(text)
+		
+
+
+# ---------- arrival vehicle (the bus that pulls away) ----------
+
+func _build_arrival(force: bool = false) -> void:
+	_arrival_cfg = _data.get("arrival", {})
+	if _arrival_cfg.is_empty():
+		return
+	if not force and not GameState.check_all(_arrival_cfg.get("if", [])):
+		return
+	var art: String = str(_arrival_cfg.get("art", ""))
+	var sz: Vector2
+	if art != "" and ResourceLoader.exists(art):
+		var pic := TextureRect.new()
+		var tex := load(art) as Texture2D
+		pic.texture = tex
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_SCALE
+		sz = tex.get_size()
+		_arrival = pic
+	else:
+		var box := ColorRect.new()
+		box.color = Color("#3a434b")
+		var s: Array = _arrival_cfg.get("size", [130, 82])
+		sz = Vector2(float(s[0]), float(s[1]))
+		_arrival = box
+	_arrival.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arrival.size = sz
+	_arrival.pivot_offset = Vector2(sz.x / 2.0, sz.y)
+	var start: Array = _arrival_cfg.get("from", [575, 252])
+	_arrival.position = Vector2(float(start[0]), float(start[1])) - _arrival.pivot_offset
+	add_child(_arrival)
+	move_child(_arrival, _bg_title.get_index() + 1)   # just above the background
+
+
+func _start_arrival() -> void:
+	if _arrival == null or not is_instance_valid(_arrival):
+		return
+	var steps: Array = _arrival_cfg.get("steps", [])
+	if steps.is_empty():
+		# old-style config: wait, then one move
+		steps = [
+			{"wait": float(_arrival_cfg.get("delay", 1.6))},
+			{"to": _arrival_cfg.get("to", [622, 222]),
+				"scale": float(_arrival_cfg.get("end_scale", 0.3)),
+				"time": float(_arrival_cfg.get("time", 4.4)),
+				"ease": "in", "alpha": 0.0},
+		]
+	if _arrival_tween != null and _arrival_tween.is_valid():
+		_arrival_tween.kill()
+	_arrival_tween = create_tween()
+	for step: Dictionary in steps:
+		if step.has("wait"):
+			_arrival_tween.tween_interval(float(step["wait"]))
+			continue
+		var dur: float = float(step.get("time", 1.0))
+		var dest: Array = step.get("to", [575, 252])
+		var end_pos: Vector2 = Vector2(float(dest[0]), float(dest[1])) - _arrival.pivot_offset
+		var ease_type: Tween.EaseType = _ease_from(str(step.get("ease", "inout")))
+		_arrival_tween.tween_property(_arrival, "position", end_pos, dur) \
+				.set_trans(Tween.TRANS_QUAD).set_ease(ease_type)
+		if step.has("scale"):
+			_arrival_tween.parallel().tween_property(_arrival, "scale",
+					Vector2.ONE * float(step["scale"]), dur) \
+					.set_trans(Tween.TRANS_QUAD).set_ease(ease_type)
+		if step.has("alpha"):
+			_arrival_tween.parallel().tween_property(_arrival, "modulate:a",
+					float(step["alpha"]), dur)
+	_arrival_tween.tween_callback(_arrival.queue_free)
+
+
+func _ease_from(ease_name: String) -> Tween.EaseType:
+	match ease_name:
+		"in":
+			return Tween.EASE_IN
+		"out":
+			return Tween.EASE_OUT
+		_:
+			return Tween.EASE_IN_OUT
+
+
+## Debug (B): replay the bus with its sound, to tune the numbers in room_data.gd.
+func _replay_arrival() -> void:
+	if not _data.has("arrival"):
+		return
+	if _arrival_tween != null and _arrival_tween.is_valid():
+		_arrival_tween.kill()
+	if is_instance_valid(_arrival):
+		_arrival.queue_free()
+	_arrival = null
+	_build_arrival(true)
+	Sfx.play("bus")
+	_start_arrival()
